@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Get Pikachu App | Latihan AJAX | Progate</title>
+    <style>
+      body {
+        text-align: center;
+      }
+
+      #pokemon-info {
+        background-color: #f1f1f1;
+        border: 1px solid #ccc;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        max-width: 300px;
+        margin: 0 auto;
+        display: none;
+      }
+
+      .loader {
+        border: 16px solid #f3f3f3;
+        border-top: 16px solid #3498db;
+        border-radius: 50%;
+        width: 80px;
+        height: 80px;
+        animation: spin 2s linear infinite;
+        margin: 20px auto;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Get Pikachu</h1>
+
+    <button type="button" id="button" onclick="toggleCard()">Get Pikachu!</button>
+    <div id="pokemon-info">
+      <div class="loader" id="loader"></div>
+      <p id="loader-text" style="display: none">Please wait...</p>
+    </div>
+
+    <script>
+      const apiUrl = "https://pokeapi.co/api/v2/pokemon/25";
+      const pokemonInfoDiv = document.getElementById("pokemon-info");
+      const loader = document.getElementById("loader");
+      const loaderText = document.getElementById("loader-text");
+      let isCardVisible = false;
+
+      const fetchData = async () => {
+        try {
+          loader.style.display = "block";
+          loaderText.style.display = "block";
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+
+          const response = await fetch(apiUrl);
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          const pokemonData = await response.json();
+
+          const pokemonNumber = pokemonData.id;
+          const pokemonName = pokemonData.name;
+          const pokemonImage = pokemonData.sprites.front_default;
+          const pokemonTypes = pokemonData.types.map((type) => type.type.name);
+
+          const pokemonInfoHTML = `
+            <p>${pokemonNumber}:</p>
+            <p>Name: ${pokemonName}</p>
+            <img src="${pokemonImage}" alt="Pokemon Image">
+            <p>Type: ${pokemonTypes.join(", ")}</p>
+          `;
+
+          pokemonInfoDiv.innerHTML = pokemonInfoHTML;
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        } finally {
+          loader.style.display = "none";
+          loaderText.style.display = "none";
+        }
+      };
+
+      const toggleCard = () => {
+        const card = document.getElementById("pokemon-info");
+        isCardVisible = !isCardVisible;
+        card.style.display = isCardVisible ? "block" : "none";
+        if (isCardVisible) {
+          fetchData();
+        }
+      };
+    </script>
+  </body>
+</html>
